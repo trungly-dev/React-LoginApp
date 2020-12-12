@@ -96,9 +96,9 @@ https://npm.runkit.com/bcrypt
     - create database with a table name "user"
     - add 3 columns : id, username, password.
     - add 2 rows of data:
-      . id - username - Password
-      . 1 - john - $2b$09$9RzewWswSWURnovdMq5UOuAcf4cjUZNH4vumkKXOwoyqQsWHsTTMu 
-      . 2 - anotheruser - $2b$09$9RzewWswSWURnovdMq5UOuAcf4cjUZNH4vumkKXOwoyqQsWHsTTMu 
+      o (id - username - Password)
+      1) - john - $2b$09$9RzewWswSWURnovdMq5UOuAcf4cjUZNH4vumkKXOwoyqQsWHsTTMu 
+      2) - anotheruser - $2b$09$9RzewWswSWURnovdMq5UOuAcf4cjUZNH4vumkKXOwoyqQsWHsTTMu 
      
 
 10. Build Main.js and Router.js
