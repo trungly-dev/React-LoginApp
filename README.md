@@ -28,15 +28,15 @@ Let get start!
    It is likely not a bug in Create React App, but something you need to fix locally.
 
    The react-scripts package provided by Create React App requires a dependency:
-
-   "webpack": "4.44.2"
+   
+   "webpack": "4.44.2".
    ------ FIX----------------------
-   cd ~ ( move to the root)
-   ls ( to find folder node_modules)
-   rm -rf node_modules (delete all this folder)
-   go to root folder delete 2 files of .json and yarn.log
-   re-create app
-   done
+      cd ~ ( move to the root)
+      ls ( to find folder node_modules)
+      rm -rf node_modules (delete all this folder)
+      go to root folder delete 2 files of .json and yarn.log
+      re-create app
+      done
    ------ FIXED----------------------
 
 3. Install Mobx + Mobx-react
@@ -49,7 +49,7 @@ Let get start!
    - add a line ("homepage": "./",)
    
 5. Edit all code from App.js
-   (attach in repo)
+   (attached in file store)
 
 
 6. create files
@@ -57,259 +57,7 @@ Let get start!
     - loginForm.js
     - inputField.js
     - SubmitButton.js
-
-   ---------------- store / UserStore.js -------------------------
-
-import { extendObservable } from 'mobx';
-
-/**
- * UserStore
- */
-
- class UserStore{
-     constructor(){
-         extendObservable(this, {
-
-            loading: true,
-            isLoggedIn: false,
-            username: ''
-
-         })
-     }
- }
-
- export default new UserStore();
-
-
-   -----------------End of store / UserStore.js ---------------
-    
-   -----------------Start of LoginForm.js ---------------
-
-import React from 'react';
-import InputField from './InputField';
-import SubmitButton from './SubmitButton';
-import UserStore from './stores/UserStore';
- 
-
- class LoginForm extends React.Component{
-
-    constructor(props) {
-      super(props);
-      this.state = {
-        username:'',
-        password:'',
-        buttonDisable: false
-      }
-    }
-    setInputValue(property, val){
-      val = val.trim();
-      if(val.length > 12) {
-        return;
-      }
-      this.setState({
-        [property]: val
-      })
-    }
-
-    resetForm() {
-      this.setState({
-        username:'',
-        password:'',
-        buttonDisabled:false
-      })
-    }
-
-    async doLogin() {
-      if (!this.state.username) {
-        return;
-      }
-      if (!this.state.password) {
-        return;
-      }
-
-      this.setState({
-        buttonDisable: true
-      })
-      try {
-        let res = await fetch('/login', {
-          method: 'post',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json' 
-          },
-          body: JSON.stringify({
-            username: this.state.username,
-            password: this.state.password
-          })
-        });
-        let result = await res.json();
-        if(result && result.success === true) {
-          UserStore.isLoggedIn = true;
-          UserStore.username = result.username;
-        }
-        else if(result && result.success === false) {
-          this.resetForm();
-          alert(result.msg);
-        }
-
-      }
-      catch(e) {
-        console.log(e);
-        this.resetForm();
-      }
-    }
-
-   render (){
-    return (
-      <div className="loginForm">
-        Log in
-        <InputField 
-          type='text'
-          placeholder='Username'
-          value={this.state.username ? this.state.username: ''}
-          onChange={ (val) => this.setInputValue('username', val)}
-        />
-        
-        <InputField 
-          type='password'
-          placeholder='Password'
-          value={this.state.password ? this.state.password: ''}
-          onChange={ (val) => this.setInputValue('password', val)}
-        />
-
-        <SubmitButton 
-          text='Login'
-          disable={this.state.buttonDisabled}
-          onClick={ () => this.doLogin()}
-        />
-      </div>
-     );
-   }
- }
-
-export default LoginForm;
-
-
-   -----------------End of LoginForm.js ---------------
-
-   -----------------Start of InputField.js ---------------
-import React from 'react';
- 
-
- class InputField extends React.Component{
-   render (){
-    return (
-      <div className="inputField">
-        <input
-          className='input'
-          type={this.props.type}
-          placeholder={this.props.placeholder}
-          value={this.props.value}
-          onChange={ (e) => this.props.onChange(e.target.value) }
-        />
-      </div>
-     );
-   }
- }
-
-export default InputField;
-
-
-
-   -----------------End of InputFIeld.js ---------------
-   -----------------Start of App.css ---------------
-body,
-html,
-#root,
-.app,
-.container {
-  width: 100%;
-  height: 100%;
-}
-
-.container {
-  font-size: 28px;
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background-color: #282c34;
-}
-.loginForm {
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 400px;
-  padding-left: 20px;
-  padding-right: 20px;
-}
-
-.inputField {
-  padding-top: 16px;
-}
-
-.input {
-  box-sizing: border-box;
-  outline: none;
-  border: solid 2px #1189de;
-  border-radius: 4px;
-  color: #292929;
-  width: 100%;
-  padding: 12px;
-  font-size: 14px;
-  background: rbga(255, 255, 255, 1);
-}
-
-.submitButton {
-  padding-top: 16px;
-}
-
-.btn {
-  width: 100%;
-  min-width: 280px;
-  color: #565656;
-  padding: 12px;
-  font-size: 14px;
-  font-weight: bold;
-  border: solid 2px #1189de;
-  border-radius: 4px;
-  background: #fff;
-  cursor: pointer;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-   -----------------End of App.css ---------------
-
-
+    (attached in file store)
 
 
 7. Build Backend
@@ -326,11 +74,11 @@ html,
       Add this line:   "start": "node Main"
     },
 
-    - npm install bcrypt --save
-    - npm install express --save
-    - npm install express-mysql-session --save
-    - npm install express-session --save
-    - npm install mysql --save
+   - npm install bcrypt --save
+   - npm install express --save
+   - npm install express-mysql-session --save
+   - npm install express-session --save 
+   - npm install mysql --save
 
 
 8. Make a GetPassword.js to get hash from bcrypt
@@ -352,7 +100,7 @@ https://npm.runkit.com/bcrypt
     +----+--------------+-----------------------------------------------------------------+
     | id |  username    |     Password                                                    |
     +----+--------------+-----------------------------------------------------------------+
-    | 1  | john         |  $2b$09$9RzewWswSWURnovdMq5UOuAcf4cjUZNH4vumkKXOwoyqQsWHsTTMu   |
+    | 1  | john            |  $2b$09$9RzewWswSWURnovdMq5UOuAcf4cjUZNH4vumkKXOwoyqQsWHsTTMu   |
     +----+--------------+-----------------------------------------------------------------+
     | 2  | anotheruser  |  $2b$09$9RzewWswSWURnovdMq5UOuAcf4cjUZNH4vumkKXOwoyqQsWHsTTMu   |
     +----+--------------+-----------------------------------------------------------------+
