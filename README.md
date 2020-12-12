@@ -31,12 +31,12 @@ Let get start!
    
    "webpack": "4.44.2".
    ------ FIX----------------------
-      cd ~ ( move to the root)
-      ls ( to find folder node_modules)
-      rm -rf node_modules (delete all this folder)
-      go to root folder delete 2 files of .json and yarn.log
-      re-create app
-      done
+   - cd ~ ( move to the root)
+   - ls ( to find folder node_modules)
+   - rm -rf node_modules (delete all this folder)
+   - go to root folder delete 2 files of .json and yarn.log
+   - re-create app
+      .done
    ------ FIXED----------------------
 
 3. Install Mobx + Mobx-react
@@ -69,10 +69,10 @@ Let get start!
     - at the entry point:  (index.js) enter "Main.js"
  
     open package.json at 
-"scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-      Add this line:   "start": "node Main"
-    },
+      "scripts": {
+         "test": "echo \"Error: no test specified\" && exit 1",
+         Add this line:   "start": "node Main"
+       },
 
    - npm install bcrypt --save
    - npm install express --save
@@ -92,205 +92,17 @@ run it from a playground  at the link:
 https://npm.runkit.com/bcrypt
 
 
-
 9. Must using MySQL server by MySQLWorkbench
     - create database with a table name "user"
     - add 3 columns : id, username, password.
     - add 2 rows of data:
-    +----+--------------+-----------------------------------------------------------------+
-    | id |  username    |     Password                                                    |
-    +----+--------------+-----------------------------------------------------------------+
-    | 1  | john            |  $2b$09$9RzewWswSWURnovdMq5UOuAcf4cjUZNH4vumkKXOwoyqQsWHsTTMu   |
-    +----+--------------+-----------------------------------------------------------------+
-    | 2  | anotheruser  |  $2b$09$9RzewWswSWURnovdMq5UOuAcf4cjUZNH4vumkKXOwoyqQsWHsTTMu   |
-    +----+--------------+-----------------------------------------------------------------+
-    
+      . id - username - Password
+      . 1 - john - $2b$09$9RzewWswSWURnovdMq5UOuAcf4cjUZNH4vumkKXOwoyqQsWHsTTMu 
+      . 2 - anotheruser - $2b$09$9RzewWswSWURnovdMq5UOuAcf4cjUZNH4vumkKXOwoyqQsWHsTTMu 
+     
 
 10. Build Main.js and Router.js
--------- Main.js ----------------------
-const express       = require('express');
-const app           = express();
-const path          = require('path');
-const mysql         = require('mysql');
-const session       = require('express-session');
-const MySQLStore    = require('express-mysql-session')(session);
-const Router        = require('./Router');
-
-app.use(express.static(path.join(__dirname, 'build')));
-app.use(express.json());
-
-console.log('Testing server');
-// Database
-
-const db = mysql.createConnection({
-    host: 'localhost',
-    port: 3306, 
-    user: 'root',
-    password: 'thisispasswork',
-    database: 'reactLogin' 
-});
-
-db.connect(function(err) {
-    if (err) {
-        console.log('DB error');
-        throw err;
-        return false;
-    }
-});
-
-const sessionStore = new MySQLStore({
-    expiration: (1825 * 86400 * 1000),
-    endConnectionOnClose: false
-} , db );
-
-app.use(session({
-    key: 'keyRandomKey',
-    secret: 'secretRandomSecret',
-    store: sessionStore,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        maxAge: (1825 * 86400 * 1000),
-        httpOnly: false
-    }
-}));
-
-new Router(app,db);
-
-app.get('/', function(req, res) {
-    res.sendFile(path.join(__dirname, 'build', 'index.html'));
-});
-
-app.listen(3000);
--------- End of Main.js ------------------------------------
-
--------- Router.js ------------------------------------
-
-const bcrypt = require('bcrypt');
-
-class Router {
-
-    constructor(app , db) {
-        this.login(app,db);
-        this.logout(app,db);
-        this.isLoggedIn(app,db);
-    }
-
-    login(app, db) {
-        app.post('/login', function (req, res) {
-                let username = req.body.username;
-                let password = req.body.password;
-
-                username = username.toLowerCase();
-
-//console.log(username);
-                if (username.length > 12 || password.length > 12) {
-                    res.json({
-                        success: false,
-                        msg: 'An errors occured, please try again'
-                    });
-                    return;
-                }
-                let cols = [username];
-
-//console.log("this is cols-username: ");
-//console.log(cols);
-
-                db.query('SELECT * FROM user WHERE username = ? LIMIT 1', cols, (err, data, fields) => {
-                        if (err) {
-                            res.json({
-                                success: false,
-                                msg: 'An error occured, please try again'
-                            });
-                            console.log("Error data connection");
-
-                            return;
-                        }
-
-                        // Found 1 user with this username
-                        if (data && data.length === 1) { 
-                            bcrypt.compare(password, data[0].password, function (bcryptErr, verified) {
-                                    if (verified) {
-                                        req.session.userID = data[0].id;
-
-                                        res.json({
-                                            success: true,
-                                            username: data[0].username
-                                        });
-                                        return;
-                                    }
-                                    else {
-
-                                        res.json({
-                                            success: false,
-                                            msg: 'Invalid password'
-                                        }); 
-                                    }
-                                }); 
-                        }
-                        else {
-                            res.json({
-                                success: false,
-                                msg: 'User not found, please try again'
-                            });
-                            console.log("User not found  ");  
-                        }
-                    });
-            });
-    }
-    logout(app, db) {
-        app.post('/logout', (req, res) => {
-            if (req.session.userID) {
-                req.session.destroy();
-                res.json({
-                    success: true
-                })
-                return true;
-            }
-            else {
-                res.json({
-                    success:false
-                })
-                return false;
-            }
-        });
-    }
-    isLoggedIn(app, db){
-        app.post('/isLoggedIn', (req, res) => {
-            if(req.session.userID) {
-                
-                let cols = [req.session.userID];
-                 
-                db.query('SELECT * FROM user WHERE id = ? LIMIT 1',cols, (err, data, fields) => {
-                    if (data && data.length === 1) {
-                        res.json( {
-                            success: true,
-                            username: data[0].username
-                        })
-                        return true;
-                    }
-                    else {
-                        res.json({
-                            success: false
-                        })
-                    }
-                });
-            }
-            else {
-                res.json({
-                    success: false
-                })
-            }
-        });
-    }
-}
-module.exports = Router;
-
-
--------- End of Router.js ------------------------------------
-
-
-
+  
 DONE
 
 
