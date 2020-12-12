@@ -7,7 +7,8 @@ Requirements work with :
 - Visual Studio Code from version 1.52.0
 - Node JS (installed in Visual Studio) Version: 12.14.1
 - MySQL Community Edition (GPL) 
-   (how to install on mac : https://www.youtube.com/watch?v=UcpHkYfWarM&t=821s )
+   (how to install on mac : 
+     https://www.youtube.com/watch?v=UcpHkYfWarM&t=821s )
 - MySQL Workbench from 8.0.22 
 - Chrome with devTools
 
@@ -22,144 +23,33 @@ Let get start!
 2. in the folder , Create an App name "frontend"
     <terminal> $npx create-react-app frontend 
 
- - Struggling Approach: "npm start" not work well in version
-There might be a problem with the project dependency tree.
-It is likely not a bug in Create React App, but something you need to fix locally.
+   - Struggling Approach: "npm start" not work well in version
+   There might be a problem with the project dependency tree.
+   It is likely not a bug in Create React App, but something you need to fix locally.
 
-The react-scripts package provided by Create React App requires a dependency:
+   The react-scripts package provided by Create React App requires a dependency:
 
-  "webpack": "4.44.2"
------- FIX----------------------
+   "webpack": "4.44.2"
+   ------ FIX----------------------
    cd ~ ( move to the root)
    ls ( to find folder node_modules)
    rm -rf node_modules (delete all this folder)
    go to root folder delete 2 files of .json and yarn.log
    re-create app
    done
------- FIXED----------------------
+   ------ FIXED----------------------
 
 3. Install Mobx + Mobx-react
-
-- move in to frontend project folder
-- run "yarn add mobx" or "npm install mobx --save"
-
-when install by using Yarn , it didn't appear file "package-lock.json
+   - move in to frontend project folder
+   - run "yarn add mobx" or "npm install mobx --save"
+   when install by using Yarn , it didn't appear file "package-lock.json
 
 4. Open file Package.json
    - after "private": true,
    - add a line ("homepage": "./",)
-
+   
 5. Edit all code from App.js
- ------- Start App.js -------------------------------
-
-import React        from 'react';
-import {observer }  from 'mobx-react'; 
-import UserStore    from './stores/UserStore';
-import LoginForm    from './LoginForm';
-import SubmitButton from './SubmitButton';
-
-import './App.css';
- 
- class App extends React.Component{
-
-  async componentDidMount(){
-
-    try{
-      let res = await fetch('/isLoggedIn', {
-        method: 'post',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      });
-
-      let result = await res.json();
-
-      if (result && result.success){
-        UserStore.loading = false;
-        UserStore.isLoggedIn = true;
-        UserStore.username = result.username;
-
-      }
-      else {
-        UserStore.loading  = false;
-        UserStore.isLoggedIn = false;
-      }
-
-    }catch(e){
-      console.log(e);
-      UserStore.loading = false;
-      UserStore.isLoggedIn = false; 
-
-    }
-  }
-
-  async doLogout(){
-
-    try{
-      let res = await fetch('/logout', {
-        method: 'post',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      });
-
-      let result = await res.json();
-      if (result && result.success){
-        UserStore.isLoggedIn = false;
-        UserStore.username = '';
-  
-      } 
-
-    }catch(e){  
-      console.log(e);
-    }
-  }
-
-   render (){
-
-    if(UserStore.loading)
-    {
-      return (
-        <div className = "app">
-          <div className = 'container'>
-             Loading, please wait ...
-          </div>
-        </div>
-      );
-    }
-    else {
-      if (UserStore.isLoggedIn){
-        return (
-          <div className = "app">
-            <div className = 'container'>
-              Welcome {UserStore.username}
-              <SubmitButton 
-                text={'Log out'}
-                disabled = {false}
-                onClick={ ()=> this.doLogout()}
-              />
-             </div>
-          </div>
-        );
-      }
-      return (
-        <div className="app">
-            <div className='container'>
-              
-              <LoginForm />
-            </div>
-        </div>
-      );
-    }
-   }
- }
-
-export default observer(App);
-
-
---------- End App.js -------------------------------
+   (attach in repo)
 
 
 6. create files
